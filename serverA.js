@@ -70,37 +70,46 @@ app.get('/api/chat/:room', async (req, res) => {
 const https = require('https');
 
 // Fonction utilitaire pour simuler un fetch forcé en IPv4 (contourne le blocage Render)
+// Fonction utilitaire ultra-robuste pour forcer l'IPv4 via DNS lookup
 function fetchIPv4(url, cookie) {
     return new Promise((resolve, reject) => {
         const urlObj = new URL(url);
-        const options = {
-            hostname: urlObj.hostname,
-            path: urlObj.pathname + urlObj.search,
-            method: 'GET',
-            family: 4, // Force l'IPv4
-            headers: {
-                'Cookie': cookie,
-                'User-Agent': 'Mozilla/5.0'
+
+        // On force la recherche DNS en IPv4 pur
+        dns.lookup(urlObj.hostname, { family: 4 }, (err, address) => {
+            if (err) {
+                return reject(new Error("Erreur DNS IPv4 : " + err.message));
             }
-        };
 
-        const req = https.request(options, (res) => {
-            let data = '';
-            res.on('data', (chunk) => { data += chunk; });
-            res.on('end', () => {
-                try {
-                    resolve({
-                        ok: res.statusCode >= 200 && res.statusCode < 300,
-                        json: async () => JSON.parse(data)
-                    });
-                } catch (e) {
-                    reject(new Error("Réponse JSON invalide de Sim Companies"));
+            const options = {
+                hostname: address, // On utilise l'adresse IP IPv4 directement
+                path: urlObj.pathname + urlObj.search,
+                method: 'GET',
+                headers: {
+                    'Host': urlObj.hostname, // On transmet le domaine d'origine dans le header
+                    'Cookie': cookie,
+                    'User-Agent': 'Mozilla/5.0'
                 }
-            });
-        });
+            };
 
-        req.on('error', (err) => { reject(err); });
-        req.end();
+            const req = https.request(options, (res) => {
+                let data = '';
+                res.on('data', (chunk) => { data += chunk; });
+                res.on('end', () => {
+                    try {
+                        resolve({
+                            ok: res.statusCode >= 200 && res.statusCode < 300,
+                            json: async () => JSON.parse(data)
+                        });
+                    } catch (e) {
+                        reject(new Error("Réponse JSON invalide de Sim Companies"));
+                    }
+                });
+            });
+
+            req.on('error', (err) => { reject(err); });
+            req.end();
+        });
     });
 }
 
