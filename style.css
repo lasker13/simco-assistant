@@ -1,0 +1,401 @@
+:root {
+  --bg-dark-red: #b8123c;
+  --bg-main: #fdbe4b;
+  --bg-card: #ffda79;
+  --bg-card-hover: #fefefe;
+  --text-dark: #36178d;
+  --text-green: #208b3a;
+  --text-red: #c1121f;
+  --border-color: #e59a35;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+#btn-search {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+/* Effet quand on clique (le bouton s'enfonce) */
+#btn-search:active {
+  transform: scale(0.95);
+}
+
+/* État de chargement */
+#btn-search.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+}
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 30px;
+  overflow-y: auto;
+  color: var(--text-dark);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.header .subtitle {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.header-right {
+  text-align: right;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.header-right span {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: inset 0 0 10px rgba(255,255,255,0.2);
+}
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.kpi-card {
+  text-align: center;
+}
+
+.kpi-title {
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.text-green {
+  color: var(--text-green);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.middle-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex: 1;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--text-green);
+  margin: 10px 0;
+}
+
+.summary-red {
+  color: var(--text-red);
+  font-weight: bold;
+}
+
+.quick-overview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.quick-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quick-label {
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.quick-val {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.sidebar {
+  width: 120px;
+  background-color: var(--bg-main);
+  border-left: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 5px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--text-dark);
+  text-transform: uppercase;
+  transition: 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+  background-color: var(--bg-card-hover);
+}
+
+.nav-icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+/* Styles du Chat */
+.chat-tabs { display: flex; gap: 10px; }
+.chat-tab { background-color: var(--bg-card); border: 2px solid var(--border-color); color: var(--text-dark); padding: 8px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.chat-tab.active, .chat-tab:hover { background-color: var(--bg-dark-red); color: white; border-color: var(--bg-dark-red); }
+
+.search-bar { display: flex; gap: 10px; margin-bottom: 15px; padding: 10px; background-color: #2503ff;}
+.search-bar input { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background-color: #ffe7e7; color: var(--text-dark); font-weight: bold; }
+.search-bar button { padding: 8px 20px; background-color: var(--text-green); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+
+.chat-container { height: 500px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.chat-message { background-color: #fff8e7; padding: 10px; border-radius: 8px; border-left: 4px solid var(--text-red); }
+.chat-time { font-size: 11px; color: #7a7ca0; margin-right: 8px; }
+.chat-player { font-weight: bold; color: var(--text-dark); margin-right: 8px; color: #06136b!important; }
+.chat-text { color: #06136b; }
+/* ==========================================
+   STYLE DU CHAT (BLEU FONCÉ & TURQUOISE)
+   ========================================== */
+
+/* Zone globale du chat */
+#view-chat {
+    background-color: #00d9ff; /* Fond bleu turquoise très clair */
+    border: 3px solid #006aff;   /* Cadre principal bleu foncé */
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(10, 37, 64, 0.15);
+}
+
+/* Onglets des salons (Chat Q / Chat F) */
+.chat-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.chat-tab {
+    background-color: #0a2540; /* Onglet inactif bleu foncé */
+    color: #ffffff;
+    border: 2px solid #0a2540;
+    padding: 8px 18px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.chat-tab:hover {
+    background-color: #0077b6; /* Bleu intermédiaire au survol */
+}
+
+.chat-tab.active {
+    background-color: #00a896; /* Onglet actif Turquoise */
+    color: #ffffff;
+    border-color: #0a2540;
+}
+
+/* Encadré de la liste des messages */
+#chat-messages {
+    background-color: #b2ebf2; /* Fond turquoise des messages */
+    border: 2px solid #0a2540;   /* Bordure bleu foncé */
+    border-radius: 8px;
+    padding: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+/* Bulle / Ligne de chaque message */
+.chat-message {
+    background-color: #ffffff;     /* Fond blanc pour garder le texte bien lisible */
+    border-left: 4px solid #0a2540; /* Liseré bleu foncé sur le côté */
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Date et Heure [JJ/MM/AAAA HH:MM] */
+.chat-time {
+    color: #0077b6; /* Bleu turquoise soutenu */
+    font-size: 0.85em;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Nom du joueur / Entreprise */
+.chat-player {
+    color: #0a2540; /* Bleu foncé */
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Texte du message */
+.chat-text {
+    color: #1c2541; /* Bleu très foncé presque noir pour la lisibilité */
+    word-break: break-word;
+}
+/* Onglets des salons (.chat-tabs / .chat-tab) */
+.chat-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.chat-tab {
+    background-color: #0a2540; /* Bleu foncé pour les onglets inactifs */
+    color: #ffffff;
+    border: 2px solid #0a2540;
+    padding: 8px 16px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.chat-tab:hover {
+    background-color: #0077b6; /* Bleu intermédiaire au survol */
+    border-color: #0077b6;
+}
+
+.chat-tab.active {
+    background-color: #00a896; /* Turquoise pour l'onglet actif */
+    color: #ffffff;
+    border-color: #0a2540;
+}
+.chat-message {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espace entre la date, le nom et le message */
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.chat-time {
+  flex-shrink: 0; /* Empêche la date de se déformer */
+  color: #888;
+  font-size: 0.85rem;
+  min-width: 50px; /* Assure un alignement propre à gauche */
+}
+
+.chat-player {
+  font-weight: bold;
+  color: var(--text-color);
+  min-width: 120px;
+}
+
+.chat-text {
+  flex-grow: 1;
+  word-break: break-word;
+}
+:root {
+  --bg-dark-red: #fdbe4b; /* On met du jaune à la place du rouge */
+  --bg-main: #db9a0d;
+  --bg-card: #fffefe;
+  --bg-card-hover: #ffecaa;
+  --text-dark: #630707;
+  --text-green: #208b3a;
+  --text-red: #c1121f;
+  --border-color: #e59a35;
+}
+
+body {
+  background-color: var(--bg-dark-red); /* Le fond autour devient aussi jaune */
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+.app-container {
+  display: flex;
+  width: 100%;
+  max-width: 1600px;
+  height: 95vh;
+  background-color: var(--bg-main);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border: none; /* Supprime complètement la bordure autour du grand cadre */
+}
+.search-container { /* Remplace par le nom de la classe de ton bloc de recherche */
+    background-color: #0059ff; /* Un rouge vif et propre */
+    padding: 10px;
+    border-radius: 6px;
+}
