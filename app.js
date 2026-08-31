@@ -60,28 +60,43 @@ function escapeHtml(text) {
 document.addEventListener('DOMContentLoaded', () => {
     let currentRoom = 'Q'; // Salon social par défaut en premier
 
-    // 1. Gestion de la navigation (Sidebar Home / Chat)
-    const navHome = document.getElementById('nav-home');
-    const navChat = document.getElementById('nav-chat');
-    const viewHome = document.getElementById('view-home');
-    const viewChat = document.getElementById('view-chat');
+    // 1. Gestion centralisée de la navigation (Sidebar)
+    const appSections = [
+        { navId: 'nav-home', viewId: 'view-home' },
+        { navId: 'nav-market', viewId: 'view-market' },
+        { navId: 'nav-production', viewId: 'view-production' },
+        { navId: 'nav-finances', viewId: 'view-finances' },
+        { navId: 'nav-stocks', viewId: 'view-stocks' },
+        { navId: 'nav-chat', viewId: 'view-chat' },
+        { navId: 'nav-settings', viewId: 'view-settings' }
+    ];
 
-    if (navHome && navChat && viewHome && viewChat) {
-        navHome.addEventListener('click', () => {
-            viewHome.style.display = 'block';
-            viewChat.style.display = 'none';
-            document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
-            navHome.classList.add('active');
-        });
+    appSections.forEach(section => {
+        const navBtn = document.getElementById(section.navId);
+        const viewDiv = document.getElementById(section.viewId);
 
-        navChat.addEventListener('click', () => {
-            viewHome.style.display = 'none';
-            viewChat.style.display = 'block';
-            document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
-            navChat.classList.add('active');
-            loadChat(currentRoom);
-        });
-    }
+        if (navBtn && viewDiv) {
+            navBtn.addEventListener('click', () => {
+                // Retire la classe 'active' de tous les boutons et l'ajoute au cliqué
+                document.querySelectorAll('.sidebar .nav-item').forEach(el => el.classList.remove('active'));
+                navBtn.classList.add('active');
+
+                // Masque toutes les vues
+                appSections.forEach(s => {
+                    const v = document.getElementById(s.viewId);
+                    if (v) v.style.display = 'none';
+                });
+
+                // Affiche uniquement la vue correspondante
+                viewDiv.style.display = 'block';
+
+                // Si on bascule sur le chat, on recharge les messages
+                if (section.viewId === 'view-chat') {
+                    loadChat(currentRoom);
+                }
+            });
+        }
+    });
 
     // 2. Charger et afficher les messages avec filtres intelligents
     async function loadChat(room = 'Q', filters = {}) {
@@ -104,21 +119,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const keyword = (filters.keyword || '').toLowerCase();
             const player = (filters.player || '').toLowerCase();
-            const dateFilter = filters.date || '';
+            const dateFilter = (filters.date || '').trim(); // Récupère ce qui est tapé
 
             const filtered = messages.filter(msg => {
                 const rawMsg = msg.message || '';
-                // On traduit le texte pour que la recherche lise directement les noms (ex: "Power")
                 const translatedText = parseResourceTags(rawMsg).toLowerCase();
-                // On combine le texte brut et le texte traduit pour élargir les résultats
                 const fullText = (rawMsg + ' ' + translatedText).toLowerCase();
                 
                 const sender = (msg.sender || '').toLowerCase();
-                const msgDate = msg.time ? msg.time.split('T')[0] : '';
+                
+                const rawTime = msg.time || msg.datetime || msg.created_at || '';
+                let msgDate = '';
+                if (rawTime) {
+                    const dateObj = new Date(rawTime);
+                    if (!isNaN(dateObj.getTime())) {
+                        msgDate = dateObj.toLocaleDateString('fr-CA'); // Format YYYY-MM-DD
+                    }
+                }
 
                 const matchKeyword = !keyword || fullText.includes(keyword);
                 const matchPlayer = !player || sender.includes(player);
-                const matchDate = !dateFilter || msgDate === dateFilter;
+                
+                // .startsWith() permet de filtrer par jour (YYYY-MM-DD), mois (YYYY-MM) ou année (YYYY)
+                const matchDate = !dateFilter || msgDate.startsWith(dateFilter);
 
                 return matchKeyword && matchPlayer && matchDate;
             });
@@ -129,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             container.innerHTML = filtered.map(msg => {
-                const rawTime = msg.time || msg.datetime;
+                const rawTime = msg.time || msg.datetime || msg.created_at;
                 let timeStr = '';
                 if (rawTime) {
                     const dateObj = new Date(rawTime);
@@ -163,6 +186,15 @@ document.addEventListener('DOMContentLoaded', () => {
         tab.addEventListener('click', () => {
             chatTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
+
+            // Vide les barres de recherche lors du changement de salon
+            const searchKeyword = document.getElementById('search-keyword');
+            const searchPlayer = document.getElementById('search-player');
+            const searchDate = document.getElementById('search-date');
+
+            if (searchKeyword) searchKeyword.value = '';
+            if (searchPlayer) searchPlayer.value = '';
+            if (searchDate) searchDate.value = '';
 
             const room = tab.getAttribute('data-room') || 'Q';
             loadChat(room);
@@ -203,10 +235,117 @@ document.addEventListener('DOMContentLoaded', () => {
     // Chargement initial sur le salon 'Q' (Social) au démarrage
     loadChat('Q');
 
-    // Actualisation automatique toutes les 3 minutes
+    // Actualisation automatique toutes les 3 minutes si on est sur le chat
     setInterval(() => {
+        const viewChat = document.getElementById('view-chat');
         if (viewChat && viewChat.style.display !== 'none') {
             loadChat(currentRoom);
         }
     }, 3 * 60 * 1000);
 });
+document.querySelectorAll('.clickable-kpi').forEach(card => {
+    card.addEventListener('click', () => {
+        const kpiType = card.getAttribute('data-kpi');
+        console.log("KPI cliqué :", kpiType);
+        
+        // Exemple d'action selon la carte cliquée
+        if (kpiType === 'company-value') {
+            alert("Clic détecté sur la valeur de l'entreprise !");
+        }
+    });
+});
+async function loadHomeStats() {
+    try {
+        const response = await fetch('/api/company-stats');
+        if (!response.ok) throw new Error("Erreur de chargement des stats");
+        const data = await response.json();
+
+        // Remplissage des KPI principaux
+        document.getElementById('cv-value').textContent = Number(data.companyValue).toLocaleString() + ' $';
+        document.getElementById('admin-costs').textContent = Number(data.adminCosts).toFixed(1) + '%';
+        document.getElementById('net-profit').textContent = Number(data.netProfit).toLocaleString() + ' $';
+        document.getElementById('world-rank').textContent = '#' + data.rank;
+        document.getElementById('world-rank-top').textContent = 'Top ' + data.rankTop + '%';
+
+        // Remplissage du bloc rapide en bas
+        document.getElementById('profit-today').textContent = (data.placesChanged >= 0 ? '+' : '') + data.placesChanged;
+        document.getElementById('cash').textContent = Number(data.cash).toLocaleString() + ' $';
+        document.getElementById('buildings-count').textContent = data.evaScore; // EVA Score
+        document.getElementById('employees-count').textContent = Number(data.employees).toLocaleString();
+        document.getElementById('products-count').textContent = Number(data.dailyRevenue).toLocaleString() + ' $';
+        document.getElementById('offers-count').textContent = data.levels; // Niveaux
+
+        // Mise à jour de l'heure de dernière synchro
+        const now = new Date().toLocaleTimeString('fr-FR');
+        const updateTimeEl = document.getElementById('update-time');
+        if (updateTimeEl) updateTimeEl.textContent = `Royaume 2 • Mis à jour à ${now}`;
+
+    } catch (err) {
+        console.error("❌ Erreur d'actualisation de l'accueil :", err);
+    }
+}
+// public/app.js
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. Chargement automatique des données au démarrage
+  loadHomeStats();
+
+  // 2. Navigation entre les onglets / sections
+  const navButtons = document.querySelectorAll('.nav-btn');
+  const sections = document.querySelectorAll('.page-section');
+
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+
+      // Mise à jour de la classe active sur les boutons
+      navButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Masquer toutes les sections et afficher celle ciblée
+      sections.forEach(sec => sec.classList.remove('active'));
+      const targetSection = document.getElementById(targetId);
+      if (targetSection) {
+        targetSection.classList.add('active');
+      }
+    });
+  });
+
+  // 3. Bouton de rafraîchissement des données
+  const refreshBtn = document.getElementById('btn-refresh');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.disabled = true;
+      refreshBtn.textContent = 'Chargement...';
+      await loadHomeStats();
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = '🔄 Rafraîchir';
+    });
+  }
+
+  // 4. Clics sur les cartes KPI de la page d'accueil
+  const kpiCards = document.querySelectorAll('.clickable-kpi');
+  kpiCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const kpiType = card.getAttribute('data-kpi');
+      handleKpiClick(kpiType);
+    });
+  });
+});
+
+// Fonction déclenchée au clic sur un KPI
+function handleKpiClick(kpiType) {
+  switch (kpiType) {
+    case 'company-value':
+      alert('Détails de la valeur d\'entreprise');
+      break;
+    case 'cash':
+      alert('Détails du Cash / Trésorerie');
+      break;
+    case 'profit':
+      alert('Détails des bénéfices du jour');
+      break;
+    default:
+      console.log('Action KPI :', kpiType);
+  }
+}

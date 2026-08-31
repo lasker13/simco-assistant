@@ -14,7 +14,7 @@
     <main class="main-content">
       
       <!-- VUE ACCUEIL -->
-      <div id="view-home">
+      <div id="view-home" class="page-view active">
         <header class="header">
           <div>
             <h1>Accueil</h1>
@@ -27,26 +27,32 @@
         </header>
 
         <section class="kpi-row">
-          <div class="card kpi-card">
+          <!-- Carte Valeur de l'entreprise -->
+          <button type="button" class="card kpi-card clickable-kpi" data-kpi="company-value">
             <div class="kpi-title">Valeur de l'entreprise</div>
             <div class="kpi-value" id="cv-value">Chargement...</div>
             <div class="text-green" id="cv-trend">--</div>
-          </div>
-          <div class="card kpi-card">
+          </button>
+
+          <!-- Carte Frais administratifs -->
+          <button type="button" class="card kpi-card clickable-kpi" data-kpi="admin-costs">
             <div class="kpi-title">Frais administratifs</div>
             <div class="kpi-value" id="admin-costs">--%</div>
-            <div style="font-size: 12px;" id="admin-costs-daily">-- / jour</div>
-          </div>
-          <div class="card kpi-card">
+          </button>
+
+          <!-- Carte Profit net hier -->
+          <button type="button" class="card kpi-card clickable-kpi" data-kpi="net-profit">
             <div class="kpi-title">Profit net hier</div>
             <div class="kpi-value" id="net-profit">Chargement...</div>
             <div style="font-size: 12px;" class="text-green" id="net-profit-trend">--</div>
-          </div>
-          <div class="card kpi-card">
-            <div class="kpi-title">Classement mondial</div>
+          </button>
+
+          <!-- Carte Classement -->
+          <button type="button" class="card kpi-card clickable-kpi" data-kpi="world-rank">
+            <div class="kpi-title">Classement</div>
             <div class="kpi-value" id="world-rank"># --</div>
             <div style="font-size: 12px;" id="world-rank-top">Top --%</div>
-          </div>
+          </button>
         </section>
 
         <section class="middle-row">
@@ -56,6 +62,7 @@
               <select id="chart-filter" style="background: transparent; border: 1px solid var(--text-dark); border-radius: 4px;">
                   <option value="7">7 derniers jours</option>
                   <option value="30">30 derniers jours</option>
+                  <option value="300">Sur l'année</option>
               </select>
             </div>
             <div style="flex:1; border: 1px dashed var(--border-color); display:flex; align-items:center; justify-content:center; opacity:0.5;">
@@ -85,15 +92,15 @@
 
         <section class="card quick-overview">
           <div class="quick-item">
-            <span class="quick-label">Bénéfice aujourd'hui</span>
+            <span class="quick-label">Places gagnées/perdues hier</span>
             <span class="quick-val text-green" id="profit-today">--</span>
           </div>
           <div class="quick-item">
-            <span class="quick-label">Trésorerie</span>
+            <span class="quick-label">Cash</span>
             <span class="quick-val" id="cash">--</span>
           </div>
           <div class="quick-item">
-            <span class="quick-label">Usines</span>
+            <span class="quick-label">EVA Score</span>
             <span class="quick-val" id="buildings-count">--</span>
           </div>
           <div class="quick-item">
@@ -101,36 +108,80 @@
             <span class="quick-val" id="employees-count">--</span>
           </div>
           <div class="quick-item">
-            <span class="quick-label">Produits</span>
+            <span class="quick-label">Recettes/jour</span>
             <span class="quick-val" id="products-count">--</span>
           </div>
           <div class="quick-item">
-            <span class="quick-label">Offres en cours</span>
+            <span class="quick-label">Niveaux</span>
             <span class="quick-val" id="offers-count">--</span>
           </div>
         </section>
       </div>
 
-      <!-- VUE CHAT (Masquée par défaut) -->
-      <div id="view-chat" style="display: none;">
+      <!-- VUE MARCHÉ -->
+      <div id="view-market" class="page-view" style="display: none;">
         <header class="header">
           <div>
-            <h1>Chat & Historique</h1>
+            <h1>Marché</h1>
+            <div class="subtitle">Suivi des prix et des ressources</div>
+          </div>
+        </header>
+        <div class="card" style="padding: 20px;">Section Marché en cours de développement...</div>
+      </div>
+
+      <!-- VUE PRODUCTION -->
+      <div id="view-production" class="page-view" style="display: none;">
+        <header class="header">
+          <div>
+            <h1>Production</h1>
+            <div class="subtitle">Gestion de vos usines et chaînes</div>
+          </div>
+        </header>
+        <div class="card" style="padding: 20px;">Section Production en cours de développement...</div>
+      </div>
+
+      <!-- VUE FINANCES -->
+      <div id="view-finances" class="page-view" style="display: none;">
+        <header class="header">
+          <div>
+            <h1>Finances</h1>
+            <div class="subtitle">Trésorerie et prêts</div>
+          </div>
+        </header>
+        <div class="card" style="padding: 20px;">Section Finances en cours de développement...</div>
+      </div>
+
+      <!-- VUE STOCKS -->
+      <div id="view-stocks" class="page-view" style="display: none;">
+        <header class="header">
+          <div>
+            <h1>Stocks</h1>
+            <div class="subtitle">Inventaire de vos entrepôts</div>
+          </div>
+        </header>
+        <div class="card" style="padding: 20px;">Section Stocks en cours de développement...</div>
+      </div>
+
+      <!-- VUE CHAT -->
+      <div id="view-chat" class="page-view" style="display: none;">
+        <header class="header">
+          <div>
+            <h1><span style="color: #00008B;">Chat & Historique</span></h1>
             <div class="subtitle">Recherchez et consultez les messages passés</div>
           </div>
           <div class="chat-tabs">
-            <button class="chat-tab active" data-room="Q">💬 Social</button>
-            <button class="chat-tab" data-room="F">🎮 Jeu</button>
-            <button class="chat-tab" data-room="S">📈 Vente EN</button>
-            <button class="chat-tab" data-room="T">📦 Vente FR</button>
+            <button type="button" class="chat-tab active" data-room="Q">💬 Social</button>
+            <button type="button" class="chat-tab" data-room="F">🎮 Jeu</button>
+            <button type="button" class="chat-tab" data-room="S">📈 Vente EN</button>
+            <button type="button" class="chat-tab" data-room="T">📦 Vente FR</button>
           </div>
         </header>
 
         <div class="card search-bar">
           <input type="text" id="search-keyword" placeholder="Mots-clés...">
           <input type="text" id="search-player" placeholder="Joueur...">
-          <input type="date" id="search-date">
-          <button id="btn-search">Rechercher</button>
+          <input type="text" id="search-date" placeholder="Date (ex: 2026-08 ou 2026-08-31)">
+          <button type="button" id="btn-search">Rechercher</button>
         </div>
 
         <div class="chat-container card" id="chat-messages">
@@ -142,38 +193,42 @@
         </div>
       </div>
 
+      <!-- VUE PARAMÈTRES -->
+      <div id="view-settings" class="page-view" style="display: none;">
+        <header class="header">
+          <div>
+            <h1>Paramètres</h1>
+            <div class="subtitle">Configuration de l'assistant</div>
+          </div>
+        </header>
+        <div class="card" style="padding: 20px;">Section Paramètres en cours de développement...</div>
+      </div>
+
     </main>
 
     <!-- Menu Latéral Droit -->
     <aside class="sidebar">
-      <div class="nav-item active" id="nav-home">
-        <div class="nav-icon">🏠</div>
-        Accueil
-      </div>
-      <div class="nav-item">
-        <div class="nav-icon">📈</div>
-        Marché
-      </div>
-      <div class="nav-item">
-        <div class="nav-icon">🏭</div>
-        Production
-      </div>
-      <div class="nav-item">
-        <div class="nav-icon">💰</div>
-        Finances
-      </div>
-      <div class="nav-item">
-        <div class="nav-icon">📦</div>
-        Stocks
-      </div>
-      <div class="nav-item" id="nav-chat">
-        <div class="nav-icon">💬</div>
-        Chat
-      </div>
-      <div class="nav-item">
-        <div class="nav-icon">⚙️</div>
-        Paramètres
-      </div>
+      <button type="button" class="nav-item active" id="nav-home" data-view="view-home">
+        <span class="nav-icon">🏠</span> Accueil
+      </button>
+      <button type="button" class="nav-item" id="nav-market" data-view="view-market">
+        <span class="nav-icon">📈</span> Marché
+      </button>
+      <button type="button" class="nav-item" id="nav-production" data-view="view-production">
+        <span class="nav-icon">🏭</span> Production
+      </button>
+      <button type="button" class="nav-item" id="nav-finances" data-view="view-finances">
+        <span class="nav-icon">💰</span> Finances
+      </button>
+      <button type="button" class="nav-item" id="nav-stocks" data-view="view-stocks">
+        <span class="nav-icon">📦</span> Stocks
+      </button>
+      <button type="button" class="nav-item" id="nav-chat" data-view="view-chat">
+        <span class="nav-icon">💬</span> Chat
+      </button>
+      <button type="button" class="nav-item" id="nav-settings" data-view="view-settings">
+        <span class="nav-icon">⚙️</span> Paramètres
+      </button>
     </aside>
 
   </div>

@@ -396,6 +396,24 @@ body {
 }
 .search-container { /* Remplace par le nom de la classe de ton bloc de recherche */
     background-color: #0059ff; /* Un rouge vif et propre */
-    padding: 10px;
     border-radius: 6px;
+}
+.kpi-card.clickable-kpi {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kpi-card.clickable-kpi:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+button.card, button.nav-item {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: inherit;
+  border: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
 }

@@ -1,11 +1,12 @@
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first'); // Force l'utilisation d'IPv4
+
 require('dotenv').config(); // Permet de lire le fichier .env en local
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first'); // Force l'utilisation d'IPv4
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,7 +22,8 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { 
     rejectUnauthorized: false 
-  }
+  },
+  family: 4 // <-- LA SOLUTION MAGIQUE EST ICI : Force la connexion à la DB en IPv4 !
 });
 
 // Création automatique de la table
@@ -177,4 +179,44 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Serveur actif sur le port ${PORT}`);
   fetchAndSaveSimCompaniesMessages();
+});
+app.get('/api/company-stats', async (req, res) => {
+    try {
+        // 1. Données d'authentification (Cash, Employés, Frais administratifs...)
+        const authRes = await fetchIPv4('https://www.simcompanies.com/api/v3/companies/auth-data/', SIM_COOKIE);
+        const authData = authRes.ok ? await authRes.json() : {};
+
+        // 2. Aperçu des finances passées (Classement, EVA score, etc.)
+        const overviewRes = await fetchIPv4('https://www.simcompanies.com/api/v2/companies/me/past-finances-overview/', SIM_COOKIE);
+        const overviewData = overviewRes.ok ? await overviewRes.json() : {};
+
+        // 3. Cashflow récent (Profits, salaires, etc.)
+        const cashflowRes = await fetchIPv4('https://www.simcompanies.com/api/v2/companies/me/cashflow/recent/', SIM_COOKIE);
+        const cashflowData = cashflowRes.ok ? await cashflowRes.json() : {};
+
+        // 4. Finances passées détaillées (pour les graphiques / historique)
+        const pastFinancesRes = await fetchIPv4('https://www.simcompanies.com/api/v3/companies/me/past-finances/', SIM_COOKIE);
+        const pastFinancesData = pastFinancesRes.ok ? await pastFinancesRes.json() : {};
+
+        const company = authData.company || authData;
+
+        res.json({
+            companyValue: company.companyValue || 0,
+            adminCosts: company.overheadRate || 0,
+            netProfit: cashflowData.netProfit || 0,
+            rank: overviewData.rank || company.rank || 0,
+            rankTop: overviewData.topPercentage || 0,
+            placesChanged: overviewData.placesChanged || 0,
+            cash: company.cash || 0,
+            evaScore: overviewData.evaScore || 0,
+            employees: company.employeesCount || company.employees || 0,
+            dailyRevenue: cashflowData.revenue || 0,
+            levels: company.level || 1,
+            pastFinances: pastFinancesData
+        });
+
+    } catch (err) {
+        console.error("❌ Erreur /api/company-stats :", err.message);
+        res.status(500).json({ error: "Erreur serveur lors de la récupération des stats" });
+    }
 });
